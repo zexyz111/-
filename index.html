@@ -4,33 +4,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CloudFlow — SoundCloud Web Player</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<title>CloudFlow — AI Music Player</title>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
 <style>
 
-/* ================= UI ================= */
+/* =====================================================
+   GLOBAL DESIGN SYSTEM
+===================================================== */
+
+:root{
+--bg:#050510;
+--glass:rgba(255,255,255,.06);
+--border:rgba(255,255,255,.12);
+--accent:#7c7cff;
+--accent2:#4fd1ff;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
 
 body{
-margin:0;
-font-family:Inter;
-background:#050510;
+background:radial-gradient(circle at 20% 20%,#0a0a2a,#050510 60%);
 color:white;
 overflow-x:hidden;
 }
 
-header{
-padding:20px 40px;
-font-size:22px;
-font-weight:700;
-background:rgba(255,255,255,.05);
-backdrop-filter:blur(20px);
+/* =====================================================
+   ANIMATED BACKGROUND
+===================================================== */
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 80% 30%,#7c7cff22,transparent 40%),
+radial-gradient(circle at 10% 80%,#4fd1ff22,transparent 40%);
+filter:blur(80px);
+z-index:-1;
+animation:bgmove 18s linear infinite alternate;
+}
+
+@keyframes bgmove{
+from{transform:translateY(-40px)}
+to{transform:translateY(40px)}
+}
+
+/* =====================================================
+   NAVBAR
+===================================================== */
+
+nav{
 position:sticky;
 top:0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 40px;
+background:rgba(5,5,16,.7);
+backdrop-filter:blur(20px);
+border-bottom:1px solid var(--border);
+z-index:10;
 }
+
+.logo{
+font-weight:800;
+letter-spacing:.5px;
+font-size:20px;
+}
+
+/* =====================================================
+   SEARCH
+===================================================== */
 
 .container{
 max-width:1100px;
@@ -41,47 +94,55 @@ padding:40px;
 .search{
 width:100%;
 padding:18px;
-border-radius:14px;
+border-radius:16px;
 border:none;
-background:#111;
+background:#0f0f1f;
 color:white;
 font-size:18px;
 outline:none;
+transition:.3s;
 }
+
+.search:focus{
+box-shadow:0 0 0 2px var(--accent);
+}
+
+/* =====================================================
+   TRACK GRID
+===================================================== */
 
 .results{
 margin-top:30px;
 display:grid;
-gap:15px;
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:24px;
 }
 
 .track{
-padding:20px;
-border-radius:16px;
-background:rgba(255,255,255,.05);
+background:var(--glass);
+border:1px solid var(--border);
+border-radius:22px;
+overflow:hidden;
 cursor:pointer;
-transition:.3s;
+transition:.35s;
+backdrop-filter:blur(25px);
+position:relative;
 }
 
 .track:hover{
-transform:translateY(-4px);
-background:rgba(255,255,255,.08);
+transform:translateY(-8px) scale(1.02);
+box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
 
-.player{
-position:fixed;
-bottom:0;
-left:0;
+.cover{
 width:100%;
-height:140px;
-background:#000;
-border-top:1px solid #222;
+height:260px;
+background-size:cover;
+background-position:center;
 }
 
-iframe{
-width:100%;
-height:100%;
-border:none;
+.trackinfo{
+padding:16px;
 }
 
 .title{
@@ -91,6 +152,88 @@ font-weight:600;
 .artist{
 opacity:.6;
 font-size:14px;
+margin-top:4px;
+}
+
+/* glow hover */
+
+.track::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(120deg,transparent,#7c7cff33,transparent);
+opacity:0;
+transition:.4s;
+}
+
+.track:hover::after{
+opacity:1;
+}
+
+/* =====================================================
+   MINI PLAYER
+===================================================== */
+
+.player{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+height:120px;
+background:rgba(0,0,0,.9);
+border-top:1px solid #222;
+backdrop-filter:blur(20px);
+display:flex;
+flex-direction:column;
+}
+
+.player-top{
+height:4px;
+background:linear-gradient(90deg,var(--accent),var(--accent2));
+animation:wave 2s linear infinite;
+}
+
+@keyframes wave{
+0%{transform:translateX(-100%)}
+100%{transform:translateX(100%)}
+}
+
+.player-ui{
+display:flex;
+align-items:center;
+gap:16px;
+padding:10px 20px;
+}
+
+.player-cover{
+width:70px;
+height:70px;
+border-radius:12px;
+background-size:cover;
+background-position:center;
+}
+
+.player-meta{
+flex:1;
+}
+
+iframe{
+width:100%;
+height:0;
+border:none;
+}
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+::-webkit-scrollbar{
+width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+background:#222;
+border-radius:10px;
 }
 
 </style>
@@ -98,79 +241,120 @@ font-size:14px;
 
 <body>
 
-<header>🎧 CloudFlow Player</header>
+<nav>
+<div class="logo">🎧 CloudFlow</div>
+<div>SoundCloud Web Player</div>
+</nav>
 
 <div class="container">
 
-<input
-class="search"
+<input class="search"
 placeholder="Search SoundCloud tracks..."
-onkeydown="if(event.key==='Enter') searchTracks(this.value)"
+onkeydown="if(event.key==='Enter')search(this.value)"
 >
 
 <div class="results" id="results"></div>
 
 </div>
 
+<!-- MINI PLAYER -->
+
 <div class="player">
+
+<div class="player-top"></div>
+
+<div class="player-ui">
+<div class="player-cover" id="playerCover"></div>
+
+<div class="player-meta">
+<div id="playerTitle">Nothing playing</div>
+<div id="playerArtist" style="opacity:.6;font-size:14px"></div>
+</div>
+</div>
+
 <iframe id="scPlayer"></iframe>
+
 </div>
 
 <script>
 
-/* =========================
-   SEARCH VIA OEMBED
-   (GitHub Pages friendly)
-========================= */
+/* =====================================================
+   CONFIG
+===================================================== */
 
-async function searchTracks(query){
+const CLIENT_ID="PASTE_CLIENT_ID_HERE";
 
-const results=document.getElementById("results");
-results.innerHTML="Searching...";
+/* =====================================================
+   SEARCH (REAL API)
+===================================================== */
+
+async function search(query){
 
 const res=await fetch(
-`https://api.allorigins.win/raw?url=${
-encodeURIComponent(
-`https://soundcloud.com/search?q=${query}`
-)}`
+`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${CLIENT_ID}&limit=18`
 );
 
-const html=await res.text();
+const data=await res.json();
 
-/* простое извлечение ссылок */
-const links=[...html.matchAll(/href="(\/[^"]+)"/g)]
-.map(m=>"https://soundcloud.com"+m[1])
-.filter(l=>l.includes("/tracks")||l.split("/").length>4)
-.slice(0,8);
+const container=document.getElementById("results");
+container.innerHTML="";
 
-results.innerHTML="";
+data.collection.forEach(track=>{
 
-links.forEach(link=>{
+const art =
+track.artwork_url
+? track.artwork_url.replace("-large","-t500x500")
+: "https://via.placeholder.com/500x500?text=No+Cover";
+
 const div=document.createElement("div");
 div.className="track";
+
 div.innerHTML=`
-<div class="title">${link.split("/").pop()}</div>
-<div class="artist">${link}</div>
+<div class="cover" style="background-image:url('${art}')"></div>
+<div class="trackinfo">
+<div class="title">${track.title}</div>
+<div class="artist">${track.user.username}</div>
+</div>
 `;
-div.onclick=()=>playTrack(link);
-results.appendChild(div);
+
+div.onclick=()=>playTrack(track);
+
+container.appendChild(div);
+
 });
 
 }
 
-/* =========================
-   PLAY TRACK
-========================= */
+/* =====================================================
+   PLAYER FIX (NO ERROR)
+===================================================== */
 
-function playTrack(url){
+let widget;
 
-const player=document.getElementById("scPlayer");
+function playTrack(track){
 
-player.src=
-`https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}
-&auto_play=true
-&visual=true
-&color=%237c7cff`;
+const iframe=document.getElementById("scPlayer");
+
+iframe.src=
+`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}&auto_play=true&visual=false`;
+
+setTimeout(()=>{
+
+widget=SC.Widget(iframe);
+
+widget.bind(SC.Widget.Events.READY,()=>{
+widget.play();
+});
+
+},400);
+
+/* update mini player */
+
+document.getElementById("playerCover").style.backgroundImage=
+`url(${track.artwork_url?.replace("-large","-t500x500")})`;
+
+document.getElementById("playerTitle").innerText=track.title;
+document.getElementById("playerArtist").innerText=track.user.username;
 
 }
 
