@@ -2,188 +2,95 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>SoundShift AI — Move Your Music</title>
+<title>CloudFlow — SoundCloud Web Player</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://w.soundcloud.com/player/api.js"></script>
 
 <style>
 
-/* =========================
-   DESIGN SYSTEM
-========================= */
-
-:root{
---bg:#050510;
---glass:rgba(255,255,255,.06);
---border:rgba(255,255,255,.12);
---accent:#7c7cff;
-}
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Inter,sans-serif;
-}
+/* ================= UI ================= */
 
 body{
-background:var(--bg);
+margin:0;
+font-family:Inter;
+background:#050510;
 color:white;
 overflow-x:hidden;
 }
 
-/* =========================
-   3D CANVAS
-========================= */
-
-#bg{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-}
-
-/* =========================
-   NAVBAR
-========================= */
-
-nav{
-position:fixed;
-top:0;
-width:100%;
-padding:18px 40px;
+header{
+padding:20px 40px;
+font-size:22px;
+font-weight:700;
+background:rgba(255,255,255,.05);
 backdrop-filter:blur(20px);
-background:rgba(5,5,16,.6);
-border-bottom:1px solid var(--border);
-display:flex;
-justify-content:space-between;
-z-index:10;
+position:sticky;
+top:0;
 }
 
-.logo{
-font-weight:800;
-letter-spacing:.5px;
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px;
 }
 
-/* =========================
-   HERO
-========================= */
-
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-}
-
-h1{
-font-size:72px;
-font-weight:800;
-line-height:1.05;
-}
-
-.subtitle{
-opacity:.7;
-margin-top:20px;
-font-size:20px;
-}
-
-/* =========================
-   BUTTON
-========================= */
-
-.btn{
-margin-top:40px;
-padding:16px 32px;
-border-radius:999px;
+.search{
+width:100%;
+padding:18px;
+border-radius:14px;
 border:none;
-cursor:pointer;
+background:#111;
 color:white;
 font-size:18px;
-background:linear-gradient(90deg,#7c7cff,#4fd1ff);
-box-shadow:0 0 40px rgba(124,124,255,.6);
+outline:none;
+}
+
+.results{
+margin-top:30px;
+display:grid;
+gap:15px;
+}
+
+.track{
+padding:20px;
+border-radius:16px;
+background:rgba(255,255,255,.05);
+cursor:pointer;
 transition:.3s;
 }
 
-.btn:hover{
-transform:scale(1.08);
+.track:hover{
+transform:translateY(-4px);
+background:rgba(255,255,255,.08);
 }
 
-/* =========================
-   GLASS CARD
-========================= */
-
-.section{
-padding:120px 10%;
+.player{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+height:140px;
+background:#000;
+border-top:1px solid #222;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:30px;
-}
-
-.card{
-background:var(--glass);
-backdrop-filter:blur(25px);
-border:1px solid var(--border);
-padding:30px;
-border-radius:22px;
-transition:.4s;
-}
-
-.card:hover{
-transform:translateY(-10px);
-box-shadow:0 20px 60px rgba(0,0,0,.5);
-}
-
-/* =========================
-   COUNTERS
-========================= */
-
-.counter{
-font-size:46px;
-font-weight:700;
-}
-
-/* =========================
-   DASHBOARD MOCK
-========================= */
-
-.dashboard{
-display:none;
-padding-top:120px;
-}
-
-.progress{
-height:12px;
-background:#111;
-border-radius:20px;
-overflow:hidden;
-margin-top:15px;
-}
-
-.bar{
+iframe{
+width:100%;
 height:100%;
-width:0%;
-background:linear-gradient(90deg,#7c7cff,#4fd1ff);
+border:none;
 }
 
-/* =========================
-   FOOTER
-========================= */
+.title{
+font-weight:600;
+}
 
-footer{
-padding:80px;
-text-align:center;
+.artist{
 opacity:.6;
+font-size:14px;
 }
 
 </style>
@@ -191,207 +98,79 @@ opacity:.6;
 
 <body>
 
-<canvas id="bg"></canvas>
+<header>🎧 CloudFlow Player</header>
 
-<nav>
-<div class="logo">SoundShift AI</div>
-<div>AI Music Transfer</div>
-</nav>
+<div class="container">
 
-<!-- HERO -->
+<input
+class="search"
+placeholder="Search SoundCloud tracks..."
+onkeydown="if(event.key==='Enter') searchTracks(this.value)"
+>
 
-<section class="hero" id="landing">
-
-<h1>
-Move Your Music<br>
-Everywhere.
-</h1>
-
-<p class="subtitle">
-AI-powered transfer from SoundCloud to Spotify, Apple Music & YouTube Music
-</p>
-
-<button class="btn" onclick="connectSoundCloud()">
-Connect SoundCloud
-</button>
-
-</section>
-
-<!-- FEATURES -->
-
-<section class="section">
-<div class="grid">
-
-<div class="card">
-<h3>AI Matching</h3>
-<p>Smart fuzzy matching finds tracks across platforms.</p>
-</div>
-
-<div class="card">
-<h3>Smart Playlists</h3>
-<p>AI generates playlists based on mood and genres.</p>
-</div>
-
-<div class="card">
-<h3>Background Sync</h3>
-<p>Your music transfers automatically.</p>
-</div>
-
-</div>
-</section>
-
-<!-- SOCIAL PROOF -->
-
-<section class="section">
-<div class="grid">
-
-<div class="card">
-<div class="counter" id="users">0</div>
-Users
-</div>
-
-<div class="card">
-<div class="counter" id="tracks">0</div>
-Tracks moved
-</div>
-
-<div class="card">
-<div class="counter" id="ai">0</div>
-AI Matches
-</div>
-
-</div>
-</section>
-
-<!-- DASHBOARD -->
-
-<section class="dashboard" id="dashboard">
-
-<div class="section">
-<h2>Transfer Progress</h2>
-
-<div class="card">
-Syncing SoundCloud → Spotify
-
-<div class="progress">
-<div class="bar" id="bar"></div>
-</div>
-
-<p id="status">Initializing AI matching...</p>
-</div>
+<div class="results" id="results"></div>
 
 </div>
 
-</section>
-
-<footer>
-© 2026 SoundShift AI — Music belongs everywhere.
-</footer>
+<div class="player">
+<iframe id="scPlayer"></iframe>
+</div>
 
 <script>
 
 /* =========================
-   THREE.JS BACKGROUND
+   SEARCH VIA OEMBED
+   (GitHub Pages friendly)
 ========================= */
 
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+async function searchTracks(query){
 
-const renderer=new THREE.WebGLRenderer({
-canvas:document.getElementById("bg"),
-alpha:true
+const results=document.getElementById("results");
+results.innerHTML="Searching...";
+
+const res=await fetch(
+`https://api.allorigins.win/raw?url=${
+encodeURIComponent(
+`https://soundcloud.com/search?q=${query}`
+)}`
+);
+
+const html=await res.text();
+
+/* простое извлечение ссылок */
+const links=[...html.matchAll(/href="(\/[^"]+)"/g)]
+.map(m=>"https://soundcloud.com"+m[1])
+.filter(l=>l.includes("/tracks")||l.split("/").length>4)
+.slice(0,8);
+
+results.innerHTML="";
+
+links.forEach(link=>{
+const div=document.createElement("div");
+div.className="track";
+div.innerHTML=`
+<div class="title">${link.split("/").pop()}</div>
+<div class="artist">${link}</div>
+`;
+div.onclick=()=>playTrack(link);
+results.appendChild(div);
 });
 
-renderer.setSize(innerWidth,innerHeight);
-
-const geometry=new THREE.SphereGeometry(2,64,64);
-const material=new THREE.MeshStandardMaterial({
-color:0x7c7cff,
-emissive:0x4444ff,
-wireframe:true
-});
-
-const sphere=new THREE.Mesh(geometry,material);
-scene.add(sphere);
-
-const light=new THREE.PointLight(0xffffff,2);
-light.position.set(5,5,5);
-scene.add(light);
-
-camera.position.z=5;
-
-function animate(){
-requestAnimationFrame(animate);
-sphere.rotation.y+=0.002;
-renderer.render(scene,camera);
 }
-animate();
 
 /* =========================
-   COUNTER ANIMATION
+   PLAY TRACK
 ========================= */
 
-function animateCounter(id,max){
-let val=0;
-const el=document.getElementById(id);
-const i=setInterval(()=>{
-val+=Math.ceil(max/60);
-if(val>=max){
-val=max;
-clearInterval(i);
-}
-el.innerText=val.toLocaleString();
-},30);
-}
+function playTrack(url){
 
-animateCounter("users",12483);
-animateCounter("tracks",842193);
-animateCounter("ai",293044);
+const player=document.getElementById("scPlayer");
 
-/* =========================
-   MOCK OAUTH + TRANSFER
-========================= */
-
-function connectSoundCloud(){
-
-document.getElementById("landing").style.display="none";
-document.getElementById("dashboard").style.display="block";
-
-startTransfer();
-
-}
-
-function startTransfer(){
-
-let progress=0;
-const bar=document.getElementById("bar");
-const status=document.getElementById("status");
-
-const steps=[
-"Analyzing music taste with AI...",
-"Matching tracks...",
-"Creating playlists...",
-"Syncing platforms...",
-"Finalizing transfer..."
-];
-
-let step=0;
-
-const interval=setInterval(()=>{
-
-progress+=2;
-bar.style.width=progress+"%";
-
-if(progress%20===0 && step<steps.length){
-status.innerText=steps[step++];
-}
-
-if(progress>=100){
-status.innerText="✅ Transfer Complete";
-clearInterval(interval);
-}
-
-},120);
+player.src=
+`https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}
+&auto_play=true
+&visual=true
+&color=%237c7cff`;
 
 }
 
