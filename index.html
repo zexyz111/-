@@ -1,28 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CloudFlow — AI Music Player</title>
+<title>CloudFlow</title>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 
 /* =====================================================
-   GLOBAL DESIGN SYSTEM
+   BASE
 ===================================================== */
-
-:root{
---bg:#050510;
---glass:rgba(255,255,255,.06);
---border:rgba(255,255,255,.12);
---accent:#7c7cff;
---accent2:#4fd1ff;
-}
 
 *{
 margin:0;
@@ -32,146 +24,110 @@ font-family:Inter,sans-serif;
 }
 
 body{
-background:radial-gradient(circle at 20% 20%,#0a0a2a,#050510 60%);
+background:#0b0b0f;
 color:white;
 overflow-x:hidden;
 }
 
 /* =====================================================
-   ANIMATED BACKGROUND
+   LAYOUT
 ===================================================== */
 
-body::before{
-content:"";
-position:fixed;
-inset:0;
-background:
-radial-gradient(circle at 80% 30%,#7c7cff22,transparent 40%),
-radial-gradient(circle at 10% 80%,#4fd1ff22,transparent 40%);
-filter:blur(80px);
-z-index:-1;
-animation:bgmove 18s linear infinite alternate;
-}
-
-@keyframes bgmove{
-from{transform:translateY(-40px)}
-to{transform:translateY(40px)}
+.app{
+display:grid;
+grid-template-columns: 1fr 320px;
+min-height:100vh;
+padding-bottom:120px;
 }
 
 /* =====================================================
-   NAVBAR
+   MAIN AREA
 ===================================================== */
 
-nav{
-position:sticky;
-top:0;
+main{
+padding:30px 50px;
+}
+
+h2{
+margin:30px 0 18px;
+font-size:22px;
+}
+
+/* =====================================================
+   GRID ROWS (LIKE SC)
+===================================================== */
+
+.row{
 display:flex;
-justify-content:space-between;
-align-items:center;
-padding:18px 40px;
-background:rgba(5,5,16,.7);
-backdrop-filter:blur(20px);
-border-bottom:1px solid var(--border);
-z-index:10;
+gap:18px;
+overflow-x:auto;
+padding-bottom:10px;
 }
 
-.logo{
-font-weight:800;
-letter-spacing:.5px;
-font-size:20px;
+.row::-webkit-scrollbar{
+display:none;
 }
 
-/* =====================================================
-   SEARCH
-===================================================== */
-
-.container{
-max-width:1100px;
-margin:auto;
-padding:40px;
-}
-
-.search{
-width:100%;
-padding:18px;
-border-radius:16px;
-border:none;
-background:#0f0f1f;
-color:white;
-font-size:18px;
-outline:none;
+.card{
+min-width:190px;
+cursor:pointer;
 transition:.3s;
 }
 
-.search:focus{
-box-shadow:0 0 0 2px var(--accent);
-}
-
-/* =====================================================
-   TRACK GRID
-===================================================== */
-
-.results{
-margin-top:30px;
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-gap:24px;
-}
-
-.track{
-background:var(--glass);
-border:1px solid var(--border);
-border-radius:22px;
-overflow:hidden;
-cursor:pointer;
-transition:.35s;
-backdrop-filter:blur(25px);
-position:relative;
-}
-
-.track:hover{
-transform:translateY(-8px) scale(1.02);
-box-shadow:0 20px 60px rgba(0,0,0,.6);
+.card:hover{
+transform:scale(1.05);
 }
 
 .cover{
-width:100%;
-height:260px;
+width:190px;
+height:190px;
+border-radius:14px;
 background-size:cover;
 background-position:center;
-}
-
-.trackinfo{
-padding:16px;
+box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
 .title{
+margin-top:8px;
+font-size:14px;
 font-weight:600;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 .artist{
+font-size:13px;
 opacity:.6;
-font-size:14px;
-margin-top:4px;
-}
-
-/* glow hover */
-
-.track::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(120deg,transparent,#7c7cff33,transparent);
-opacity:0;
-transition:.4s;
-}
-
-.track:hover::after{
-opacity:1;
 }
 
 /* =====================================================
-   MINI PLAYER
+   SIDEBAR
+===================================================== */
+
+aside{
+border-left:1px solid #1a1a22;
+padding:30px;
+background:#0f0f14;
+}
+
+.artistRow{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:14px;
+}
+
+.avatar{
+width:44px;
+height:44px;
+border-radius:50%;
+background:#333;
+background-size:cover;
+}
+
+/* =====================================================
+   PLAYER
 ===================================================== */
 
 .player{
@@ -179,61 +135,46 @@ position:fixed;
 bottom:0;
 left:0;
 width:100%;
-height:120px;
-background:rgba(0,0,0,.9);
+height:110px;
+background:#111;
 border-top:1px solid #222;
-backdrop-filter:blur(20px);
-display:flex;
-flex-direction:column;
-}
-
-.player-top{
-height:4px;
-background:linear-gradient(90deg,var(--accent),var(--accent2));
-animation:wave 2s linear infinite;
-}
-
-@keyframes wave{
-0%{transform:translateX(-100%)}
-100%{transform:translateX(100%)}
-}
-
-.player-ui{
 display:flex;
 align-items:center;
-gap:16px;
 padding:10px 20px;
+gap:20px;
+z-index:999;
 }
 
-.player-cover{
+.playerCover{
 width:70px;
 height:70px;
-border-radius:12px;
+border-radius:10px;
 background-size:cover;
 background-position:center;
 }
 
-.player-meta{
+.meta{
 flex:1;
 }
 
+.controls button{
+background:#222;
+border:none;
+color:white;
+padding:10px 14px;
+margin-right:8px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.controls button:hover{
+background:#333;
+}
+
 iframe{
-width:100%;
+width:0;
 height:0;
 border:none;
-}
-
-/* =====================================================
-   SCROLLBAR
-===================================================== */
-
-::-webkit-scrollbar{
-width:8px;
-}
-
-::-webkit-scrollbar-thumb{
-background:#222;
-border-radius:10px;
 }
 
 </style>
@@ -241,38 +182,52 @@ border-radius:10px;
 
 <body>
 
-<nav>
-<div class="logo">🎧 CloudFlow</div>
-<div>SoundCloud Web Player</div>
-</nav>
+<div class="app">
 
-<div class="container">
+<!-- ================= MAIN ================= -->
 
-<input class="search"
-placeholder="Search SoundCloud tracks..."
-onkeydown="if(event.key==='Enter')search(this.value)"
->
+<main>
 
-<div class="results" id="results"></div>
+<h2>🔥 Рекомендации</h2>
+<div class="row" id="rec"></div>
+
+<h2>🕘 Недавно популярное</h2>
+<div class="row" id="recent"></div>
+
+<h2>✨ Для вас</h2>
+<div class="row" id="foryou"></div>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside>
+
+<h3>Артисты</h3>
+<div id="artists"></div>
+
+</aside>
 
 </div>
 
-<!-- MINI PLAYER -->
+<!-- ================= PLAYER ================= -->
 
 <div class="player">
 
-<div class="player-top"></div>
+<div class="playerCover" id="playerCover"></div>
 
-<div class="player-ui">
-<div class="player-cover" id="playerCover"></div>
-
-<div class="player-meta">
+<div class="meta">
 <div id="playerTitle">Nothing playing</div>
 <div id="playerArtist" style="opacity:.6;font-size:14px"></div>
 </div>
+
+<div class="controls">
+<button onclick="prev()">⏮</button>
+<button onclick="toggle()">▶</button>
+<button onclick="next()">⏭</button>
 </div>
 
-<iframe id="scPlayer"></iframe>
+<iframe id="sc"></iframe>
 
 </div>
 
@@ -282,81 +237,122 @@ onkeydown="if(event.key==='Enter')search(this.value)"
    CONFIG
 ===================================================== */
 
-const CLIENT_ID="PASTE_CLIENT_ID_HERE";
+const CLIENT_ID="PASTE_CLIENT_ID";
 
 /* =====================================================
-   SEARCH (REAL API)
+   LOAD ROW
 ===================================================== */
 
-async function search(query){
+async function loadRow(query,containerId){
 
 const res=await fetch(
-`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${CLIENT_ID}&limit=18`
+`https://api-v2.soundcloud.com/search/tracks?q=${query}&client_id=${CLIENT_ID}&limit=12`
 );
 
 const data=await res.json();
-
-const container=document.getElementById("results");
-container.innerHTML="";
+const container=document.getElementById(containerId);
 
 data.collection.forEach(track=>{
 
-const art =
-track.artwork_url
+const art = track.artwork_url
 ? track.artwork_url.replace("-large","-t500x500")
-: "https://via.placeholder.com/500x500?text=No+Cover";
+: "https://via.placeholder.com/500";
 
-const div=document.createElement("div");
-div.className="track";
+const card=document.createElement("div");
+card.className="card";
 
-div.innerHTML=`
+card.innerHTML=`
 <div class="cover" style="background-image:url('${art}')"></div>
-<div class="trackinfo">
 <div class="title">${track.title}</div>
 <div class="artist">${track.user.username}</div>
-</div>
 `;
 
-div.onclick=()=>playTrack(track);
+card.onclick=()=>addToQueue(track);
 
-container.appendChild(div);
+container.appendChild(card);
+
+addArtist(track.user);
 
 });
 
 }
 
 /* =====================================================
-   PLAYER FIX (NO ERROR)
+   ARTISTS
 ===================================================== */
 
+const artists=new Set();
+
+function addArtist(user){
+
+if(artists.has(user.id)) return;
+artists.add(user.id);
+
+const el=document.createElement("div");
+el.className="artistRow";
+
+el.innerHTML=`
+<div class="avatar" style="background-image:url('${user.avatar_url}')"></div>
+<div>${user.username}</div>
+`;
+
+document.getElementById("artists").appendChild(el);
+}
+
+/* =====================================================
+   QUEUE + PLAYER
+===================================================== */
+
+let queue=[];
+let index=0;
 let widget;
 
-function playTrack(track){
+function addToQueue(track){
+queue.push(track);
+play(queue.length-1);
+}
 
-const iframe=document.getElementById("scPlayer");
+function play(i){
+
+index=i;
+const track=queue[i];
+
+const iframe=document.getElementById("sc");
 
 iframe.src=
-`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}&auto_play=true&visual=false`;
+`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}&auto_play=true`;
 
 setTimeout(()=>{
-
 widget=SC.Widget(iframe);
-
-widget.bind(SC.Widget.Events.READY,()=>{
 widget.play();
-});
-
 },400);
-
-/* update mini player */
 
 document.getElementById("playerCover").style.backgroundImage=
 `url(${track.artwork_url?.replace("-large","-t500x500")})`;
 
-document.getElementById("playerTitle").innerText=track.title;
-document.getElementById("playerArtist").innerText=track.user.username;
-
+playerTitle.innerText=track.title;
+playerArtist.innerText=track.user.username;
 }
+
+function next(){
+if(queue[index+1]) play(index+1);
+}
+
+function prev(){
+if(queue[index-1]) play(index-1);
+}
+
+function toggle(){
+widget.toggle();
+}
+
+/* =====================================================
+   LOAD DATA
+===================================================== */
+
+loadRow("phonk","rec");
+loadRow("rap","recent");
+loadRow("electronic","foryou");
 
 </script>
 
